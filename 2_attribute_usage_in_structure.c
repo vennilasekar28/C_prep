@@ -12,9 +12,9 @@ int main()
     typedef struct example2{
         char a;
         int b;
-    }with_align;
+    }__attribute__((packed)) with_align;
 
-    with_align structure2 __attribute__((packed));
+    with_align structure2 ;
 
     printf("sizeof without_align = %lu\n ",sizeof(structure1));
     printf("sizeof with_align = %lu\n ",sizeof(structure2));
