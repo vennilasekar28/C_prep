@@ -1,5 +1,10 @@
 {
     "files.associations": {
-        "7_Array_using_ptr.C": "cpp"
-    }
+        "7_Array_using_ptr.C": "cpp",
+        "deque": "c",
+        "string": "c",
+        "unordered_map": "c",
+        "vector": "c"
+    },
+    "C_Cpp.errorSquiggles": "disabled"
 }
