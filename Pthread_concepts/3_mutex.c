@@ -2,6 +2,7 @@
 #include<pthread.h>
 #include<stdlib.h>
 #include<math.h>
+#include <unistd.h>
 
 
 /*Generate PRACH input sequence with u=1, length =139;
@@ -22,6 +23,12 @@ typedef struct{
     double corr_out_pwr;
     int corr_len;
 }corr_struct;
+
+
+double global_max_corr = 0.0;
+int global_best_u = -1;
+
+pthread_mutex_t lock;
 
 void gen_prach_seq(int u, cplx *prach_seq)
 {
@@ -70,6 +77,22 @@ void *correlation(void *inpParam){
     //correlation out power
     *corr_out_pwr = out.re * out.re + out.im * out.im;
 
+    pthread_mutex_lock(&lock);
+
+    if(*corr_out_pwr > global_max_corr){
+
+        usleep(100);
+
+        global_max_corr =  *corr_out_pwr;
+
+        usleep(100);
+
+        global_best_u = u;
+
+    }
+
+    pthread_mutex_unlock(&lock);
+
     free(local_replica_seq);
 
     return NULL;
@@ -81,6 +104,8 @@ int main(){
 
     //Prach Parameters
     int u=1, u1=1, u2=7, u3=13;
+
+    pthread_mutex_init(&lock,NULL);
 
     //generate input seq which needs to be correlated with different local replica sequences
     cplx *inp_seq = malloc(L_RA * sizeof(cplx));
@@ -114,6 +139,10 @@ int main(){
 
     printf("The correlation output power with u1, u7, u13 are %f\t%f\t%f\n",\
         thread1_parm.corr_out_pwr, thread2_parm.corr_out_pwr,main_thread_parm.corr_out_pwr);
+
+    printf("global_max_corr=%f\tglobal_best_u=%d\n",global_max_corr,global_best_u);
+
+    pthread_mutex_destroy(&lock);
 
     return 0;
 }
